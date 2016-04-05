@@ -57,7 +57,10 @@ static CGFloat btnOffsetY = 80.0;
 - (void)show
 {
     [self builtInterface];
-    self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI_4);
+    [UIView animateWithDuration:.3 animations:^{
+        self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI_4);
+    }];
+    
     NSInteger count = self.btns.count;
     CGFloat space = 0;
     space = ([UIScreen mainScreen].bounds.size.width - count * btnWidth ) / (count + 1 );
@@ -72,7 +75,10 @@ static CGFloat btnOffsetY = 80.0;
 
 - (void)dismiss
 {
-    self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI / 180.0);
+    [UIView animateWithDuration:.3 animations:^{
+        self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI / 180.0);
+    }];
+    
     NSInteger count = self.btns.count;
     CGPoint point = self.mainBtn.center;
     [self.animator removeAllBehaviors];
@@ -147,7 +153,9 @@ static CGFloat btnOffsetY = 80.0;
     if (_mainBtn == nil) {
         _mainBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - btnWidth / 2.0, [UIScreen mainScreen].bounds.size.height - btnOffsetY, btnWidth, btnWidth)];
         [_mainBtn addTarget:self action:@selector(btnClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [_mainBtn setBackgroundColor:[UIColor blueColor]];
+        [_mainBtn.layer setCornerRadius:btnWidth / 2.0];
+        UIImage* image = [UIImage imageNamed:@"mainBtnImage"];
+        [_mainBtn setImage:image forState:UIControlStateNormal];
     }
     return _mainBtn;
 }
