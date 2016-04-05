@@ -8,93 +8,96 @@
 
 #import "RXRotateButtonOverlayView.h"
 
-static CGFloat labelWidth = 60.0f;
-static CGFloat labelOffsetY = 80.0;
+static CGFloat btnWidth = 60.0f;
+static CGFloat btnOffsetY = 80.0;
 
 @interface RXRotateButtonOverlayView ()
 @property (nonatomic, strong) UIDynamicAnimator* animator;
 @property (nonatomic, strong) UIButton* mainBtn;
-@property (nonatomic, strong) NSMutableArray* labels;
+@property (nonatomic, strong) NSMutableArray* btns;
+@property (nonatomic, strong) UITapGestureRecognizer* tap;
 @end
 
 @implementation RXRotateButtonOverlayView
 
 - (instancetype)init
 {
-    if (self=[super initWithFrame:[UIScreen mainScreen].bounds]) {
-        [self builtInterface];
+    if (self=[super init]) {
+        
     }
     return self;
 }
 
 - (void)builtInterface
 {
+    [self removeGestureRecognizer:self.tap];
+    [self addGestureRecognizer:self.tap];
+    //setColor
     [self setBackgroundColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:0.7]];
-    [self addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedSelf:)]];
+    //clear dynamic behaviours
+    [self.animator removeAllBehaviors];
+    //clear btns
+    [self.btns enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [obj removeFromSuperview];
+    }];
+    [self.btns removeAllObjects];
     
+    //add new Btns
     if (self.titles.count > 0) {
         for (NSString* title in self.titles) {
-            UIView* v = [self addLabelWithName:title];
-            [self.labels addObject:v];
+            UIView* v = [self addBtnWithName:title];
+            [self.btns addObject:v];
         }
         [self addSubview:self.mainBtn];
     }
 }
 
-- (UIView*)addLabelWithName:(NSString*)title
-{
-    UILabel *view = [[UILabel alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - labelWidth / 2.0, [UIScreen mainScreen].bounds.size.height - labelOffsetY, labelWidth, labelWidth)];
-    view.textColor = [UIColor whiteColor];
-    view.backgroundColor = [UIColor yellowColor];
-    view.layer.masksToBounds = YES;
-    view.layer.cornerRadius = 30;
-    view.text = title;
-    view.textAlignment = NSTextAlignmentCenter;
-    view.font = [UIFont systemFontOfSize:17];
-    [self addSubview:view];
-    view.userInteractionEnabled = YES;
-    [view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectLabelAction:)]];
-    return view;
-}
-- (UIDynamicAnimator *)animator
-{
-    if (_animator == nil) {
-        _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self];
-    }
-    return _animator;
-}
-- (UIButton *)mainBtn
-{
-    if (_mainBtn == nil) {
-        _mainBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - labelWidth / 2.0, [UIScreen mainScreen].bounds.size.height - labelOffsetY, labelWidth, labelWidth)];
-        [_mainBtn addTarget:self action:@selector(btnClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [_mainBtn setBackgroundColor:[UIColor blueColor]];
-    }
-    return _mainBtn;
-}
 
-- (NSMutableArray *)labels
+#pragma mark - public
+- (void)show
 {
-    if (_labels == nil) {
-        _labels = [NSMutableArray array];
-    }
-    return _labels;
-}
-- (void)selectLabelAction:(UITapGestureRecognizer*)gesture
-{
-    UILabel* l = (UILabel*)gesture.view;
-    NSLog(@"%@",l.text);
-    if ([self.delegate respondsToSelector:@selector(didSelected:)]) {
-        [self.delegate didSelected:[self.titles indexOfObject:l.text]];
-    }
-}
-
-- (void)setTitles:(NSArray *)titles
-{
-    self.labels = [NSMutableArray array];
-    _titles = [NSArray arrayWithArray:titles];
     [self builtInterface];
+    self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI_4);
+    NSInteger count = self.btns.count;
+    CGFloat space = 0;
+    space = ([UIScreen mainScreen].bounds.size.width - count * btnWidth ) / (count + 1 );
+    [self.animator removeAllBehaviors];
+    for (int i = 0; i< count; i++) {
+        CGPoint buttonPoint=  CGPointMake((i + 1)* (space ) + (i+0.5) * btnWidth, [UIScreen mainScreen].bounds.size.height - btnOffsetY * 2);
+        UISnapBehavior *sna = [[UISnapBehavior alloc]initWithItem:[self.btns objectAtIndex:i] snapToPoint:buttonPoint];
+        sna.damping = .5;
+        [self.animator addBehavior:sna];
+    }
 }
+
+- (void)dismiss
+{
+    self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI / 180.0);
+    NSInteger count = self.btns.count;
+    CGPoint point = self.mainBtn.center;
+    [self.animator removeAllBehaviors];
+    for (int i = 0; i< count; i++) {
+        UISnapBehavior *sna = [[UISnapBehavior alloc]initWithItem:[self.btns objectAtIndex:i] snapToPoint:point];
+        sna.damping = .9;
+        [self.animator addBehavior:sna];
+    }
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self removeFromSuperview];
+    });
+}
+
+#pragma mark - action
+
+- (void)selectBtnAction:(UITapGestureRecognizer*)gesture
+{
+    UIButton* btn = (UIButton*)gesture.view;
+    if ([self.delegate respondsToSelector:@selector(didSelected:)]) {
+        [self.delegate didSelected:[self.titles indexOfObject:btn.titleLabel.text]];
+    }
+}
+
+
 
 - (void)clickedSelf:(id)sender
 {
@@ -105,39 +108,62 @@ static CGFloat labelOffsetY = 80.0;
     
 }
 
-- (void)show
+#pragma mark - private
+- (UIView*)addBtnWithName:(NSString*)title
 {
-    self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI_4);
-    NSInteger count = self.labels.count;
-    CGFloat space = 0;
-    space = ([UIScreen mainScreen].bounds.size.width - count * labelWidth ) / (count + 1 );
-    [self.animator removeAllBehaviors];
-    for (int i = 0; i< count; i++) {
-        CGPoint buttonPoint=  CGPointMake((i + 1)* (space ) + (i+0.5) * labelWidth, [UIScreen mainScreen].bounds.size.height - labelOffsetY*2);
-        UISnapBehavior *sna = [[UISnapBehavior alloc]initWithItem:[self.labels objectAtIndex:i] snapToPoint:buttonPoint];
-        sna.damping = .5;
-        [self.animator addBehavior:sna];
-    }
+    UIButton *view = [[UIButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - btnWidth / 2.0, [UIScreen mainScreen].bounds.size.height - btnOffsetY, btnWidth, btnWidth)];
+    view.titleLabel.textColor = [UIColor whiteColor];
+    view.backgroundColor = [UIColor yellowColor];
+    view.layer.masksToBounds = YES;
+    view.layer.cornerRadius = btnWidth / 2.0;
+    view.titleLabel.text = title;
+    view.titleLabel.textAlignment = NSTextAlignmentCenter;
+    view.titleLabel.font = [UIFont systemFontOfSize:17];
+    [self addSubview:view];
+    view.userInteractionEnabled = YES;
+    [view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectBtnAction:)]];
+    return view;
 }
 
-- (void)dismiss
+
+#pragma mark - getter & setter
+- (UITapGestureRecognizer *)tap
 {
-    self.mainBtn.transform = CGAffineTransformMakeRotation(M_PI / 180.0);
-    NSInteger count = self.labels.count;
-    CGPoint point = self.mainBtn.center;
-    [self.animator removeAllBehaviors];
-    for (int i = 0; i< count; i++) {
-        UISnapBehavior *sna = [[UISnapBehavior alloc]initWithItem:[self.labels objectAtIndex:i] snapToPoint:point];
-        sna.damping = .9;
-        [self.animator addBehavior:sna];
+    if (_tap == nil) {
+        _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedSelf:)];
     }
-//    [UIView animateWithDuration:.5 animations:^{
-//        [self removeFromSuperview];
-//
-//    }];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self removeFromSuperview];
-    });
+    return _tap;
+}
+
+- (UIDynamicAnimator *)animator
+{
+    if (_animator == nil) {
+        _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self];
+    }
+    return _animator;
+}
+- (UIButton *)mainBtn
+{
+    if (_mainBtn == nil) {
+        _mainBtn = [[UIButton alloc] initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - btnWidth / 2.0, [UIScreen mainScreen].bounds.size.height - btnOffsetY, btnWidth, btnWidth)];
+        [_mainBtn addTarget:self action:@selector(btnClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [_mainBtn setBackgroundColor:[UIColor blueColor]];
+    }
+    return _mainBtn;
+}
+
+- (NSMutableArray *)btns
+{
+    if (_btns == nil) {
+        _btns = [NSMutableArray array];
+    }
+    return _btns;
+}
+
+- (void)setTitles:(NSArray *)titles
+{
+    self.btns = [NSMutableArray array];
+    _titles = [NSArray arrayWithArray:titles];
 }
 
 @end

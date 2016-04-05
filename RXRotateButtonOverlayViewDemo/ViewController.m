@@ -58,6 +58,7 @@
         _overlayView = [[RXRotateButtonOverlayView alloc] init];
         [_overlayView setTitles:@[@"test1",@"test2",@"test3"]];
         [_overlayView setDelegate:self];
+        [_overlayView setFrame:self.view.bounds];
     }
     return _overlayView;
 }
