@@ -17,6 +17,8 @@
 @property (nonatomic, weak) id<RXRotateButtonOverlayViewDelegate> delegate;
 //初始化使用的菜单名称
 @property (nonatomic, strong) NSArray* titles;
+//初始化使用的菜单图片
+@property (nonatomic, strong) NSArray* titleImages;
 //展示
 - (void)show;
 //消失

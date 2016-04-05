@@ -119,10 +119,17 @@ static CGFloat btnOffsetY = 80.0;
 {
     UIButton *view = [[UIButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - btnWidth / 2.0, [UIScreen mainScreen].bounds.size.height - btnOffsetY, btnWidth, btnWidth)];
     view.titleLabel.textColor = [UIColor whiteColor];
-    view.backgroundColor = [UIColor yellowColor];
+    NSUInteger index = [self.titles indexOfObject:title];
+    NSString* imageName = [self.titleImages objectAtIndex:index];
+    if (imageName) {
+        [view setImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    }else{
+        view.backgroundColor = [UIColor yellowColor];
+    }
     view.layer.masksToBounds = YES;
     view.layer.cornerRadius = btnWidth / 2.0;
-    view.titleLabel.text = title;
+    [view setTitle:title forState:UIControlStateNormal];
+    [view setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     view.titleLabel.textAlignment = NSTextAlignmentCenter;
     view.titleLabel.font = [UIFont systemFontOfSize:17];
     [self addSubview:view];
@@ -174,4 +181,9 @@ static CGFloat btnOffsetY = 80.0;
     _titles = [NSArray arrayWithArray:titles];
 }
 
+- (void)setTitleImages:(NSArray *)titleImages
+{
+    self.btns = [NSMutableArray array];
+    _titleImages = [NSArray arrayWithArray:titleImages];
+}
 @end

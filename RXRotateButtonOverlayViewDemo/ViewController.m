@@ -49,6 +49,8 @@
         _btn = [[UIButton alloc] initWithFrame:CGRectMake((SCREEN_WIDTH - 100) / 2.0,SCREEN_HEIGHT - 300, 100, 44)];
         [_btn addTarget:self action:@selector(btnClicked:) forControlEvents:UIControlEventTouchUpInside];
         [_btn setBackgroundColor:[UIColor greenColor]];
+        [_btn setTitle:@"click me !" forState:UIControlStateNormal];
+        [_btn.layer setCornerRadius:5];
     }
     return _btn;
 }
@@ -57,6 +59,7 @@
     if (_overlayView == nil) {
         _overlayView = [[RXRotateButtonOverlayView alloc] init];
         [_overlayView setTitles:@[@"test1",@"test2",@"test3"]];
+        [_overlayView setTitleImages:@[@"first",@"second",@"third"]];
         [_overlayView setDelegate:self];
         [_overlayView setFrame:self.view.bounds];
     }
