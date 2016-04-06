@@ -7,8 +7,9 @@
 //
 
 #import "RXRotateButtonOverlayView.h"
+#import "ImageAndTitleVerticalButton.h"
 
-static CGFloat btnWidth = 60.0f;
+static CGFloat btnWidth = 80.0f;
 static CGFloat btnOffsetY = 80.0;
 
 @interface RXRotateButtonOverlayView ()
@@ -45,7 +46,14 @@ static CGFloat btnOffsetY = 80.0;
     //add new Btns
     if (self.titles.count > 0) {
         for (NSString* title in self.titles) {
-            UIView* v = [self addBtnWithName:title];
+            UIView* v = nil;
+            if (self.titleImages.count == self.titles.count) {
+                NSUInteger index = [self.titles indexOfObject:title];
+                v = [self addBtnWithTitle:title andTitleImage:[self.titleImages objectAtIndex:index]];
+            }else{
+                v = [self addBtnWithTitle:title];
+            }
+            
             [self.btns addObject:v];
         }
         [self addSubview:self.mainBtn];
@@ -54,6 +62,7 @@ static CGFloat btnOffsetY = 80.0;
 
 
 #pragma mark - public
+//show the overlay
 - (void)show
 {
     [self builtInterface];
@@ -73,6 +82,7 @@ static CGFloat btnOffsetY = 80.0;
     }
 }
 
+//dismiss the overlay
 - (void)dismiss
 {
     [UIView animateWithDuration:.3 animations:^{
@@ -83,12 +93,16 @@ static CGFloat btnOffsetY = 80.0;
     CGPoint point = self.mainBtn.center;
     [self.animator removeAllBehaviors];
     for (int i = 0; i< count; i++) {
-        UISnapBehavior *sna = [[UISnapBehavior alloc]initWithItem:[self.btns objectAtIndex:i] snapToPoint:point];
+        UIView* v = [self.btns objectAtIndex:i];
+        [UIView animateWithDuration:.2 animations:^{
+            [v setAlpha:0];
+        }];
+        UISnapBehavior *sna = [[UISnapBehavior alloc]initWithItem:v snapToPoint:point];
         sna.damping = .9;
         [self.animator addBehavior:sna];
     }
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self removeFromSuperview];
     });
 }
@@ -115,20 +129,29 @@ static CGFloat btnOffsetY = 80.0;
 }
 
 #pragma mark - private
-- (UIView*)addBtnWithName:(NSString*)title
+- (UIView*)addBtnWithTitle:(NSString*)title andTitleImage:(NSString*)imageName
+{
+    ImageAndTitleVerticalButton *view = [[ImageAndTitleVerticalButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - btnWidth / 2.0, [UIScreen mainScreen].bounds.size.height - btnOffsetY, btnWidth, btnWidth)];
+    view.titleLabel.textColor = [UIColor whiteColor];
+    [view setImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
+    [view setTitle:title forState:UIControlStateNormal];
+    [view setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    view.titleLabel.textAlignment = NSTextAlignmentCenter;
+    view.titleLabel.font = [UIFont systemFontOfSize:17];
+    [self addSubview:view];
+    view.userInteractionEnabled = YES;
+    [view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectBtnAction:)]];
+    return view;
+}
+
+- (UIView*)addBtnWithTitle:(NSString*)title
 {
     UIButton *view = [[UIButton alloc]initWithFrame:CGRectMake([UIScreen mainScreen].bounds.size.width / 2.0 - btnWidth / 2.0, [UIScreen mainScreen].bounds.size.height - btnOffsetY, btnWidth, btnWidth)];
     view.titleLabel.textColor = [UIColor whiteColor];
-    NSUInteger index = [self.titles indexOfObject:title];
-    NSString* imageName = [self.titleImages objectAtIndex:index];
-    if (imageName) {
-        [view setImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
-    }else{
-        view.backgroundColor = [UIColor yellowColor];
-    }
+    view.backgroundColor = [UIColor yellowColor];
+    [view setTitle:title forState:UIControlStateNormal];
     view.layer.masksToBounds = YES;
     view.layer.cornerRadius = btnWidth / 2.0;
-    [view setTitle:title forState:UIControlStateNormal];
     [view setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     view.titleLabel.textAlignment = NSTextAlignmentCenter;
     view.titleLabel.font = [UIFont systemFontOfSize:17];

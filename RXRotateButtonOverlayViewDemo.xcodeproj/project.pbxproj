@@ -13,6 +13,7 @@
 		746FFE791CB3E99C00103952 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 746FFE781CB3E99C00103952 /* Assets.xcassets */; };
 		746FFE7C1CB3E99C00103952 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 746FFE7A1CB3E99C00103952 /* LaunchScreen.storyboard */; };
 		746FFE861CB3E9E100103952 /* RXRotateButtonOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 746FFE851CB3E9E100103952 /* RXRotateButtonOverlayView.m */; };
+		74805B1D1CB53AB100D953E3 /* ImageAndTitleVerticalButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 74805B1C1CB53AB100D953E3 /* ImageAndTitleVerticalButton.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,8 @@
 		746FFE7D1CB3E99C00103952 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		746FFE841CB3E9E100103952 /* RXRotateButtonOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RXRotateButtonOverlayView.h; sourceTree = "<group>"; };
 		746FFE851CB3E9E100103952 /* RXRotateButtonOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RXRotateButtonOverlayView.m; sourceTree = "<group>"; };
+		74805B1B1CB53AB100D953E3 /* ImageAndTitleVerticalButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageAndTitleVerticalButton.h; sourceTree = "<group>"; };
+		74805B1C1CB53AB100D953E3 /* ImageAndTitleVerticalButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageAndTitleVerticalButton.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +88,8 @@
 			children = (
 				746FFE841CB3E9E100103952 /* RXRotateButtonOverlayView.h */,
 				746FFE851CB3E9E100103952 /* RXRotateButtonOverlayView.m */,
+				74805B1B1CB53AB100D953E3 /* ImageAndTitleVerticalButton.h */,
+				74805B1C1CB53AB100D953E3 /* ImageAndTitleVerticalButton.m */,
 			);
 			path = RXRotateButtonOverlayView;
 			sourceTree = "<group>";
@@ -162,6 +167,7 @@
 				746FFE741CB3E99C00103952 /* ViewController.m in Sources */,
 				746FFE711CB3E99C00103952 /* AppDelegate.m in Sources */,
 				746FFE6E1CB3E99C00103952 /* main.m in Sources */,
+				74805B1D1CB53AB100D953E3 /* ImageAndTitleVerticalButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
